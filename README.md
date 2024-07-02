@@ -27,3 +27,8 @@ anybuy (e-commerce platform) - це інтернет-магазин, в яком
 * переглянути список покупців
 * заблокувати певного покупця від можливості робити замовлення
 * відмінити замовлення з коментарем
+
+### Add packeges
+
+``go get github.com/google/uuid``
+``go get -u github.com/gofiber/fiber/v3``
