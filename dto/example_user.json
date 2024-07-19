@@ -1,0 +1,7 @@
+{
+  "id": 1,
+  "user_name": "John Doe",
+  "phone_number": "+1234567890",
+  "roles": ["buyer"],
+  "is_blocked": false
+}
