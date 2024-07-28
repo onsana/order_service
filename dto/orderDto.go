@@ -1,21 +1,25 @@
 package dto
 
 import (
-	"github.com/google/uuid"
-	"go/constant"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type OrderDto struct {
-	ID          uuid.UUID     `json:"id"`
-	UserID      int           `json:"user_id"`
-	Products    []Product     `json:"products"`
-	Address     Address       `json:"address"`
-	TotalPrice  float32       `json:"totalPrice"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
-	Description string        `json:"description"`
-	Status      constant.Kind `json:"status"`
+	ID     uuid.UUID `json:"id"`
+	UserID int       `json:"user_id"`
+	// Products    []Product `json:"products"`
+	City        string    `json:"city"`
+	Street      string    `json:"street"`
+	HouseNumber string    `json:"house_number"`
+	Flat        string    `json:"flat"`
+	PostCode    string    `json:"post_code"`
+	TotalPrice  float32   `json:"totalPrice"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Description string    `json:"description"`
+	Status      Kind      `json:"status"`
 }
 
 type Address struct {
