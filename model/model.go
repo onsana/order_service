@@ -1,31 +1,33 @@
 package model
 
 import (
-	"go/constant"
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/google/uuid"
 )
 
 type Order struct {
-	gorm.Model
-	UserID      int           `json:"user_id"`
-	Products    []Product     `json:"products"`
-	Address     Address       `gorm:"references:Address" json:"address"`
-	TotalPrice  float32       `json:"totalPrice"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
-	Description string        `json:"description"`
-	Status      constant.Kind `json:"status"`
-	User        User          `gorm:"foreignKey:UserID"`
+	ID          uuid.UUID `json:"id"`
+	UserID      int       `json:"user_id"`
+	Products    []Product `json:"products" gorm:"many2many:order_products;"`
+	City        string    `json:"city"`
+	Street      string    `json:"street"`
+	HouseNumber string    `json:"house_number"`
+	Flat        string    `json:"flat"`
+	PostCode    string    `json:"post_code"`
+	TotalPrice  float32   `json:"totalPrice"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Description string    `json:"description"`
+	Status      Kind      `json:"status"`
 }
 
 type User struct {
-	gorm.Model
-	Name        string   `json:"user_name"`
-	PhoneNumber string   `json:"phone_number"`
-	Roles       []string `json:"roles"`
-	Blocked     bool     `json:"is_blocked"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"user_name"`
+	PhoneNumber string    `json:"phone_number"`
+	Roles       []string  `json:"roles"`
+	Blocked     bool      `json:"is_blocked"`
 }
 
 type Address struct {
@@ -37,10 +39,10 @@ type Address struct {
 }
 
 type Product struct {
-	ID          int     `json:"id" gorm:"primaryKey"`
-	ProductName string  `json:"product_name"`
-	Quantity    int     `json:"quantity"`
-	Price       float32 `json:"price"`
+	ProductID   uuid.UUID `json:"product_id"`
+	ProductName string    `json:"product_name"`
+	Quantity    int       `json:"quantity"`
+	Price       float32   `json:"price"`
 }
 
 type Kind string

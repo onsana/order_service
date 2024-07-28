@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"github.com/onsana/order_service/model"
+	"github.com/onsana/order_service/dto"
 )
 
 type Dbinstance struct {
@@ -39,7 +39,7 @@ func ConnectDb() {
 	db.Logger = logger.Default.LogMode(logger.Info)
 
 	log.Println("running migrations")
-	db.AutoMigrate(&model.User{}, &model.Product{}, &model.Order{}, &model.Address{})
+	db.AutoMigrate(&dto.UserDto{}, &dto.Product{}, &dto.OrderDto{})
 
 	DB = Dbinstance{
 
