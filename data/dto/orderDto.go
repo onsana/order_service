@@ -1,4 +1,4 @@
-package model
+package dto
 
 import (
 	"time"
@@ -6,15 +6,12 @@ import (
 	"github.com/google/uuid"
 )
 
-type Order struct {
+// TODO remove dto from name
+type OrderDto struct {
 	ID          uuid.UUID `json:"id"`
-	UserID      int       `json:"user_id"`
-	Products    []Product `json:"products" gorm:"many2many:order_products;"`
-	City        string    `json:"city"`
-	Street      string    `json:"street"`
-	HouseNumber string    `json:"house_number"`
-	Flat        string    `json:"flat"`
-	PostCode    string    `json:"post_code"`
+	UserDto     UserDto   `json:"user"`
+	Products    []Product `json:"products"`
+	Address     Address   `json:"address"`
 	TotalPrice  float32   `json:"totalPrice"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
@@ -22,20 +19,13 @@ type Order struct {
 	Status      Kind      `json:"status"`
 }
 
-type User struct {
-	ID          uuid.UUID `json:"id"`
-	Name        string    `json:"user_name"`
-	PhoneNumber string    `json:"phone_number"`
-	Roles       []string  `json:"roles"`
-	Blocked     bool      `json:"is_blocked"`
-}
-
 type Address struct {
-	City        string `json:"city"`
-	Street      string `json:"street"`
-	HouseNumber string `json:"house_number"`
-	Flat        string `json:"flat"`
-	PostCode    string `json:"post_code"`
+	ID          uuid.UUID `json:"id"`
+	City        string    `json:"city"`
+	Street      string    `json:"street"`
+	HouseNumber string    `json:"house_number"`
+	Flat        string    `json:"flat"`
+	PostCode    string    `json:"post_code"`
 }
 
 type Product struct {
