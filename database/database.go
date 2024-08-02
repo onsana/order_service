@@ -2,14 +2,13 @@ package database
 
 import (
 	"fmt"
+	"github.com/onsana/order_service/data/model"
 	"log"
 	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-
-	"github.com/onsana/order_service/dto"
 )
 
 type Dbinstance struct {
@@ -38,8 +37,18 @@ func ConnectDb() {
 	log.Println("connected")
 	db.Logger = logger.Default.LogMode(logger.Info)
 
+	// Ensure the uuid-ossp extension is enabled
+	if err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"").Error; err != nil {
+		log.Fatal("Failed to create uuid-ossp extension. \n", err)
+		os.Exit(2)
+	}
+
 	log.Println("running migrations")
-	db.AutoMigrate(&dto.UserDto{}, &dto.Product{}, &dto.OrderDto{})
+	db.AutoMigrate(
+		&model.User{},
+		&model.Product{},
+		&model.Order{},
+		&model.Address{})
 
 	DB = Dbinstance{
 
