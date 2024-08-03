@@ -1,6 +1,7 @@
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "user_id": 12345,
+  "user":{
+    "id": "9d5b7d7e-e29b-41d4-a716-446655440300"
+  },
   "products": [
     {
       "product_id": "8d5b7d7e-6a5a-4e9f-8c58-28456c88b9e3",
@@ -16,7 +17,6 @@
     }
   ],
   "address": {
-    "id": "7e9f7c6b-9b8d-4e8a-9c7d-28456c88b9e3",
     "city": "Sample City",
     "street": "Sample Street",
     "house_number": "123",
