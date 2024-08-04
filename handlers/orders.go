@@ -27,6 +27,13 @@ type OrderService interface {
 	CreateOrder(orderDto *dto.OrderDto) uuid.UUID
 }
 
+type AddressService interface {
+	CreateAddress(addressDto *dto.Address, order model.Order) *dto.Address
+}
+type ProductService interface {
+	CreateProducts(productsDto *[]dto.Product, order model.Order) *[]dto.Product
+}
+
 type OrderHandler struct {
 	oS OrderService
 }

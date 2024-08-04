@@ -19,25 +19,54 @@ type productStorage interface {
 	CreateProducts(order *[]model.Product) []model.Product
 }
 
-type OrderService struct {
+type orderService struct {
 	oSt orderStorage
+	aS  addressService
+	pS  productService
+}
+type addressService struct {
 	aSt addressStorage
+}
+
+type productService struct {
 	pSt productStorage
 }
 
-func NewService(oSt orderStorage, aSt addressStorage, pSt productStorage) *OrderService {
-	return &OrderService{oSt: oSt, aSt: aSt, pSt: pSt}
+func NewOrderService(oSt orderStorage, aS addressService, pS productService) *orderService {
+	return &orderService{
+		oSt: oSt,
+		aS:  aS,
+		pS:  pS,
+	}
+}
+func NewAddressService(aSt addressStorage) *addressService {
+	return &addressService{aSt: aSt}
+}
+func NewProductService(pSt productStorage) *productService {
+	return &productService{pSt: pSt}
 }
 
-func (o *OrderService) CreateOrder(orderDto *dto.OrderDto) uuid.UUID {
+func (a *addressService) CreateAddress(addressDto *dto.Address, order model.Order) *dto.Address {
+	address := data.ConvertAddress(*addressDto, order)
+	a.aSt.CreateAddress(address)
+	return data.ConvertAddressToDto(*address)
+}
+
+func (p *productService) CreateProducts(productsDto *[]dto.Product, order model.Order) *[]dto.Product {
+	products := data.ConvertProduct(*productsDto, order)
+	p.pSt.CreateProducts(products)
+	return data.ConvertProductToDto(*products)
+}
+
+func (o *orderService) CreateOrder(orderDto *dto.OrderDto) uuid.UUID {
 	order := data.ConvertOrder(*orderDto)
 	o.oSt.CreateOrder(order)
 
-	address := data.ConvertAddress(*orderDto, *order)
-	o.aSt.CreateAddress(address)
+	//address := data.ConvertAddress(*orderDto, *order)
+	o.aS.CreateAddress(&orderDto.Address, *order)
 
-	products := data.ConvertProduct(*orderDto, *order)
-	o.pSt.CreateProducts(products)
+	//products := data.ConvertProduct(*orderDto, *order)
+	o.pS.CreateProducts(&orderDto.Products, *order)
 
 	return order.ID
 }

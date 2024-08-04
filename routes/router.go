@@ -12,7 +12,11 @@ func SetupRoutes(app *fiber.App) {
 	orderStorage := storage.NewOrderStorage()
 	addressStorage := storage.NewAddressStorage()
 	productStorage := storage.NewProductStorage()
-	orderService := service.NewService(orderStorage, addressStorage, productStorage)
+
+	addressService := service.NewAddressService(addressStorage)
+	productService := service.NewProductService(productStorage)
+	orderService := service.NewOrderService(orderStorage, *addressService, *productService)
+
 	orderHandler := handlers.NewHandler(orderService)
 
 	app.Get("/orders", handlers.GetAllOrders)

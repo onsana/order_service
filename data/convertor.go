@@ -2,19 +2,18 @@ package data
 
 import (
 	"fmt"
-	dto2 "github.com/onsana/order_service/data/dto"
+	"github.com/onsana/order_service/data/dto"
 	"github.com/onsana/order_service/data/model"
 )
 
-func convertUser(userDto dto2.UserDto) model.User {
+func convertUser(userDto dto.UserDto) model.User {
 	user := model.User{
 		ID: userDto.ID,
 	}
 	return user
 }
 
-func ConvertAddress(orderDto dto2.OrderDto, order model.Order) *model.Address {
-	addressDto := orderDto.Address
+func ConvertAddress(addressDto dto.Address, order model.Order) *model.Address {
 	fmt.Printf("addressdto  2  %s\n", addressDto)
 	address := model.Address{
 		ID:          addressDto.ID,
@@ -30,7 +29,21 @@ func ConvertAddress(orderDto dto2.OrderDto, order model.Order) *model.Address {
 	return &address
 }
 
-func ConvertOrder(orderDto dto2.OrderDto) *model.Order {
+func ConvertAddressToDto(address model.Address) *dto.Address {
+	fmt.Printf("addressdto  2  %s\n", address)
+	addressDto := dto.Address{
+		ID:          address.ID,
+		City:        address.City,
+		Street:      address.Street,
+		HouseNumber: address.HouseNumber,
+		Flat:        address.Flat,
+		PostCode:    address.PostCode,
+	}
+	fmt.Printf("address  2  %s\n", address)
+	return &addressDto
+}
+
+func ConvertOrder(orderDto dto.OrderDto) *model.Order {
 	user := convertUser(orderDto.UserDto)
 	order := &model.Order{
 		ID:          orderDto.ID,
@@ -45,9 +58,9 @@ func ConvertOrder(orderDto dto2.OrderDto) *model.Order {
 	return order
 }
 
-func ConvertProduct(orderDto dto2.OrderDto, order model.Order) *[]model.Product {
+func ConvertProduct(productsDto []dto.Product, order model.Order) *[]model.Product {
 	var products []model.Product
-	for _, p := range orderDto.Products {
+	for _, p := range productsDto {
 		product := model.Product{
 			ProductID:   p.ProductID,
 			ProductName: p.ProductName,
@@ -57,6 +70,19 @@ func ConvertProduct(orderDto dto2.OrderDto, order model.Order) *[]model.Product 
 		}
 		products = append(products, product)
 	}
-
 	return &products
+}
+
+func ConvertProductToDto(products []model.Product) *[]dto.Product {
+	var productsDTO []dto.Product
+	for _, p := range products {
+		product := dto.Product{
+			ProductID:   p.ProductID,
+			ProductName: p.ProductName,
+			Quantity:    p.Quantity,
+			Price:       p.Price,
+		}
+		productsDTO = append(productsDTO, product)
+	}
+	return &productsDTO
 }
