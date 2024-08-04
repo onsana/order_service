@@ -9,6 +9,7 @@ import (
 
 type orderStorage interface {
 	CreateOrder(order *model.Order) model.Order
+	GetAllOrders() []model.Order
 }
 
 type addressStorage interface {
@@ -69,4 +70,7 @@ func (o *orderService) CreateOrder(orderDto *dto.OrderDto) uuid.UUID {
 	o.pS.CreateProducts(&orderDto.Products, *order)
 
 	return order.ID
+}
+func (o *orderService) GetAllOrders() []model.Order {
+	return o.oSt.GetAllOrders()
 }

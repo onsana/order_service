@@ -1,9 +1,10 @@
 package storage
 
 import (
+	"sync"
+
 	"github.com/onsana/order_service/data/model"
 	"github.com/onsana/order_service/database"
-	"sync"
 )
 
 type OrderStorage struct {
@@ -33,6 +34,12 @@ func NewAddressStorage() *AddressStorage {
 func (s *OrderStorage) CreateOrder(order *model.Order) model.Order {
 	database.DB.Db.Create(order)
 	return *order
+}
+
+func (s *OrderStorage) GetAllOrders() []model.Order {
+	var orders []model.Order
+	database.DB.Db.Find(orders)
+	return orders
 }
 
 func (s *ProductStorage) CreateProducts(products *[]model.Product) []model.Product {
