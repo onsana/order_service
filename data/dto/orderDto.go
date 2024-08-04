@@ -35,6 +35,12 @@ type Product struct {
 	Price       float32   `json:"price"`
 }
 
+type ProductMockDto struct {
+	ProductID   string  `json:"product_id"`
+	ProductName string  `json:"product_name"`
+	Price       float64 `json:"price"`
+}
+
 type Kind string
 
 const (

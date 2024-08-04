@@ -2,16 +2,42 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v3"
+	"github.com/onsana/order_service/data"
 	"github.com/onsana/order_service/database"
-	"github.com/onsana/order_service/middleware"
-	"github.com/onsana/order_service/routes"
+	"github.com/onsana/order_service/handlers"
+	"github.com/onsana/order_service/service"
+	"github.com/onsana/order_service/storage"
 )
 
 func main() {
 	database.ConnectDb()
 	// Initialize a new Fiber app
 	app := fiber.New()
-	app.Use(middleware.AuthMiddleware)
-	routes.SetupRoutes(app)
-	app.Listen(":6000")
+	app.Use(handlers.AuthMiddleware)
+	setup(app)
+	err := app.Listen(":6000")
+	if err != nil {
+		return
+	}
+}
+
+func setup(app *fiber.App) {
+
+	orderStorage := storage.NewOrderStorage()
+	addressStorage := storage.NewAddressStorage()
+	productStorage := storage.NewProductStorage()
+
+	idToProductDto := data.CreateProductMock()
+	productGateway := service.NewProductGatewayMock(idToProductDto)
+	addressService := service.NewAddressService(addressStorage)
+	productService := service.NewProductService(productStorage, productGateway)
+	orderService := service.NewOrderService(orderStorage, *addressService, *productService)
+
+	orderHandler := handlers.NewHandler(orderService)
+
+	app.Get("/orders", handlers.GetAllOrders)
+	// app.Get("/orders/:id", handlers.GetOrderById)
+	app.Post("/orders", orderHandler.CreateOrder)
+	// app.Delete("/orders/:id", handlers.DeleteOrderById)
+	// app.Put("/orders/:id", handlers.UpdateOrderDataById)
 }
