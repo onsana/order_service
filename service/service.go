@@ -1,10 +1,12 @@
 package service
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/onsana/order_service/data"
 	"github.com/onsana/order_service/data/dto"
 	"github.com/onsana/order_service/data/model"
+	"github.com/onsana/order_service/handlers"
 )
 
 type orderStorage interface {
@@ -17,7 +19,7 @@ type addressStorage interface {
 }
 
 type productStorage interface {
-	CreateProducts(order *[]model.Product) []model.Product
+	CreateProducts(order *[]model.Product) ([]model.Product, error)
 }
 
 type orderService struct {
@@ -31,6 +33,7 @@ type addressService struct {
 
 type productService struct {
 	pSt productStorage
+	pG  handlers.ProductGateway
 }
 
 func NewOrderService(oSt orderStorage, aS addressService, pS productService) *orderService {
@@ -43,8 +46,19 @@ func NewOrderService(oSt orderStorage, aS addressService, pS productService) *or
 func NewAddressService(aSt addressStorage) *addressService {
 	return &addressService{aSt: aSt}
 }
-func NewProductService(pSt productStorage) *productService {
-	return &productService{pSt: pSt}
+
+func NewProductService(pSt productStorage, pG handlers.ProductGateway) *productService {
+	return &productService{pSt: pSt, pG: pG}
+}
+
+func NewProductGatewayMock(idToProductDto map[uuid.UUID]dto.Product) *handlers.ProductGatewayMock {
+	return &handlers.ProductGatewayMock{
+		IdToProductDto: idToProductDto,
+	}
+}
+
+func NewProductGatewayImpl() *handlers.ProductGatewayImpl {
+	return &handlers.ProductGatewayImpl{}
 }
 
 func (a *addressService) CreateAddress(addressDto *dto.Address, order model.Order) *dto.Address {
@@ -53,23 +67,39 @@ func (a *addressService) CreateAddress(addressDto *dto.Address, order model.Orde
 	return data.ConvertAddressToDto(*address)
 }
 
-func (p *productService) CreateProducts(productsDto *[]dto.Product, order model.Order) *[]dto.Product {
+func (p *productService) CreateProducts(productsDto *[]dto.Product, order model.Order) (*[]dto.Product, error) {
 	products := data.ConvertProduct(*productsDto, order)
-	p.pSt.CreateProducts(products)
-	return data.ConvertProductToDto(*products)
+	_, err := p.pSt.CreateProducts(products)
+	if err != nil {
+		return nil, err
+	}
+	return data.ConvertProductToDto(*products), nil
 }
 
-func (o *orderService) CreateOrder(orderDto *dto.OrderDto) uuid.UUID {
+func (p *productService) ValidateProducts(productsDto *[]dto.Product) (*[]dto.Product, error) {
+	realProducts, absentIds := p.pG.GetExistingProducts(productsDto)
+	if len(absentIds) > 0 {
+		return nil, fmt.Errorf("Order cannot be created due to the absence of products: %v !", absentIds)
+	}
+	return realProducts, nil
+}
+
+func (o *orderService) CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error) {
+	validatedProducts, err := o.pS.ValidateProducts(&orderDto.Products)
+	if err != nil {
+		return uuid.Nil, err
+	}
 	order := data.ConvertOrder(*orderDto)
 	o.oSt.CreateOrder(order)
 
-	//address := data.ConvertAddress(*orderDto, *order)
 	o.aS.CreateAddress(&orderDto.Address, *order)
 
-	//products := data.ConvertProduct(*orderDto, *order)
-	o.pS.CreateProducts(&orderDto.Products, *order)
+	_, err = o.pS.CreateProducts(validatedProducts, *order)
+	if err != nil {
+		return uuid.Nil, err
+	}
 
-	return order.ID
+	return order.ID, nil
 }
 func (o *orderService) GetAllOrders() []model.Order {
 	return o.oSt.GetAllOrders()

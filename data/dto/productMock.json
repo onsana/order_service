@@ -1,0 +1,52 @@
+[
+  {
+    "product_id": "8d5b7d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 1",
+    "price": 49.99
+  },
+  {
+    "product_id": "9b6e7c9d-7c8a-4f8a-9c6b-195a6c8a7b3e",
+    "product_name": "Product 2",
+    "price": 99.99
+  },
+  {
+    "product_id": "9d5b8d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 3",
+    "price": 49.99
+  },
+  {
+    "product_id": "1a3b8d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 4",
+    "price": 99.99
+  },
+  {
+    "product_id": "7a3b8d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 5",
+    "price": 19.99
+  },
+  {
+    "product_id": "6a3b8d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 6",
+    "price": 39.99
+  },
+  {
+    "product_id": "4a3b8d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 7",
+    "price": 59.99
+  },
+  {
+    "product_id": "3a3b8d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 8",
+    "price": 89.99
+  },
+  {
+    "product_id": "2a3b8d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 9",
+    "price": 24.99
+  },
+  {
+    "product_id": "9a3b9d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "product_name": "Product 10",
+    "price": 14.99
+  }
+]

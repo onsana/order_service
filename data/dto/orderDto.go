@@ -35,6 +35,12 @@ type Product struct {
 	Price       float32   `json:"price"`
 }
 
+type ProductMockDto struct {
+	ProductID   string  `json:"product_id"`
+	ProductName string  `json:"product_name"`
+	Price       float64 `json:"price"`
+}
+
 type Kind string
 
 const (
@@ -43,9 +49,6 @@ const (
 
 	// Paid indicates that the order has been paid for.
 	Paid Kind = "paid"
-
-	// Delivered indicates that the order has been delivered to the buyer.
-	Delivered Kind = "delivered"
 
 	// Canceled indicates that the administrator has canceled the order from Pending or Paid status.
 	Canceled Kind = "canceled"

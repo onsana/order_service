@@ -3,6 +3,8 @@ package storage
 import (
 	"sync"
 
+	"fmt"
+
 	"github.com/onsana/order_service/data/model"
 	"github.com/onsana/order_service/database"
 )
@@ -42,9 +44,13 @@ func (s *OrderStorage) GetAllOrders() []model.Order {
 	return orders
 }
 
-func (s *ProductStorage) CreateProducts(products *[]model.Product) []model.Product {
-	database.DB.Db.Create(products)
-	return *products
+func (s *ProductStorage) CreateProducts(products *[]model.Product) ([]model.Product, error) {
+	tx := database.DB.Db.Create(products)
+	if tx.Error != nil {
+		return nil, fmt.Errorf("Error during saving products with ids: %v ", products)
+	}
+	//TODO remove returned *products
+	return *products, nil
 }
 
 func (s *AddressStorage) CreateAddress(address *model.Address) model.Address {

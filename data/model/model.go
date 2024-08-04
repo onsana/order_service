@@ -59,9 +59,6 @@ const (
 	// Paid indicates that the order has been paid for.
 	Paid Kind = "paid"
 
-	// Delivered indicates that the order has been delivered to the buyer.
-	Delivered Kind = "delivered"
-
 	// Canceled indicates that the administrator has canceled the order from Pending or Paid status.
 	Canceled Kind = "canceled"
 )
