@@ -10,15 +10,15 @@ import (
 )
 
 type orderStorage interface {
-	CreateOrder(order *model.Order) model.Order
+	CreateOrder(order *model.Order) error
 }
 
 type addressStorage interface {
-	CreateAddress(address *model.Address) model.Address
+	CreateAddress(address *model.Address) error
 }
 
 type productStorage interface {
-	CreateProducts(order *[]model.Product) ([]model.Product, error)
+	CreateProducts(order *[]model.Product) error
 }
 
 type orderService struct {
@@ -60,15 +60,18 @@ func NewProductGatewayImpl() *handlers.ProductGatewayImpl {
 	return &handlers.ProductGatewayImpl{}
 }
 
-func (a *addressService) CreateAddress(addressDto *dto.Address, order model.Order) *dto.Address {
+func (a *addressService) CreateAddress(addressDto *dto.Address, order model.Order) (*dto.Address, error) {
 	address := data.ConvertAddress(*addressDto, order)
-	a.aSt.CreateAddress(address)
-	return data.ConvertAddressToDto(*address)
+	err := a.aSt.CreateAddress(address)
+	if err != nil {
+		return addressDto, err
+	}
+	return data.ConvertAddressToDto(*address), nil
 }
 
 func (p *productService) CreateProducts(productsDto *[]dto.Product, order model.Order) (*[]dto.Product, error) {
 	products := data.ConvertProduct(*productsDto, order)
-	_, err := p.pSt.CreateProducts(products)
+	err := p.pSt.CreateProducts(products)
 	if err != nil {
 		return nil, err
 	}
@@ -88,10 +91,17 @@ func (o *orderService) CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error) {
 	if err != nil {
 		return uuid.Nil, err
 	}
-	order := data.ConvertOrder(*orderDto)
-	o.oSt.CreateOrder(order)
 
-	o.aS.CreateAddress(&orderDto.Address, *order)
+	order := data.ConvertOrder(*orderDto)
+	err = o.oSt.CreateOrder(order)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	_, err = o.aS.CreateAddress(&orderDto.Address, *order)
+	if err != nil {
+		return uuid.Nil, err
+	}
 
 	_, err = o.pS.CreateProducts(validatedProducts, *order)
 	if err != nil {
