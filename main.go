@@ -35,7 +35,7 @@ func setup(app *fiber.App) {
 
 	orderHandler := handlers.NewHandler(orderService)
 
-	app.Get("/orders", handlers.GetAllOrders)
+	app.Get("/orders", orderHandler.GetAllOrders)
 	// app.Get("/orders/:id", handlers.GetOrderById)
 	app.Post("/orders", orderHandler.CreateOrder)
 	// app.Delete("/orders/:id", handlers.DeleteOrderById)
