@@ -11,13 +11,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type Dbinstance struct {
-	Db *gorm.DB
-}
-
-var DB Dbinstance
-
-func ConnectDb() {
+func NewDBConnection() *gorm.DB {
 	dsn := fmt.Sprintf(
 		"host=postgresdb user=%s password=%s dbname=%s port=5432 sslmode=disable",
 		os.Getenv("DB_USER"),
@@ -31,7 +25,6 @@ func ConnectDb() {
 
 	if err != nil {
 		log.Fatal("Failed to connect to database. \n", err)
-		os.Exit(2)
 	}
 
 	log.Println("connected")
@@ -40,19 +33,17 @@ func ConnectDb() {
 	// Ensure the uuid-ossp extension is enabled
 	if err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"").Error; err != nil {
 		log.Fatal("Failed to create uuid-ossp extension. \n", err)
-		os.Exit(2)
 	}
 
 	log.Println("running migrations")
-	db.AutoMigrate(
+	err = db.AutoMigrate(
 		&model.User{},
 		&model.Product{},
 		&model.Order{},
 		&model.Address{})
-
-	DB = Dbinstance{
-
-		Db: db,
+	if err != nil {
+		log.Fatal("Failed to auto migrate in database. \n", err)
 	}
 
+	return db
 }

@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	database.ConnectDb()
 	// Initialize a new Fiber app
 	app := fiber.New()
 	app.Use(handlers.AuthMiddleware)
@@ -22,10 +21,11 @@ func main() {
 }
 
 func setup(app *fiber.App) {
+	db := database.NewDBConnection()
 
-	orderStorage := storage.NewOrderStorage()
-	addressStorage := storage.NewAddressStorage()
-	productStorage := storage.NewProductStorage()
+	orderStorage := storage.NewOrderStorage(db)
+	addressStorage := storage.NewAddressStorage(db)
+	productStorage := storage.NewProductStorage(db)
 
 	idToProductDto := data.CreateProductMock()
 	productGateway := service.NewProductGatewayMock(idToProductDto)

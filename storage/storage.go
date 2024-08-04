@@ -3,41 +3,44 @@ package storage
 import (
 	"fmt"
 	"github.com/onsana/order_service/data/model"
-	"github.com/onsana/order_service/database"
-	"sync"
+	"gorm.io/gorm"
+	//"sync"
 )
 
 type OrderStorage struct {
-	orderM sync.Mutex
+	//orderM sync.Mutex
+	db *gorm.DB
 }
 
 type ProductStorage struct {
-	productM sync.Mutex
+	//productM sync.Mutex
+	db *gorm.DB
 }
 
 type AddressStorage struct {
-	addressM sync.Mutex
+	//addressM sync.Mutex
+	db *gorm.DB
 }
 
-func NewOrderStorage() *OrderStorage {
-	return &OrderStorage{}
+func NewOrderStorage(db *gorm.DB) *OrderStorage {
+	return &OrderStorage{db: db}
 }
 
-func NewProductStorage() *ProductStorage {
-	return &ProductStorage{}
+func NewProductStorage(db *gorm.DB) *ProductStorage {
+	return &ProductStorage{db: db}
 }
 
-func NewAddressStorage() *AddressStorage {
-	return &AddressStorage{}
+func NewAddressStorage(db *gorm.DB) *AddressStorage {
+	return &AddressStorage{db: db}
 }
 
 func (s *OrderStorage) CreateOrder(order *model.Order) model.Order {
-	database.DB.Db.Create(order)
+	s.db.Create(order)
 	return *order
 }
 
 func (s *ProductStorage) CreateProducts(products *[]model.Product) ([]model.Product, error) {
-	tx := database.DB.Db.Create(products)
+	tx := s.db.Create(products)
 	if tx.Error != nil {
 		return nil, fmt.Errorf("Error during saving products with ids: %v ", products)
 	}
@@ -46,6 +49,6 @@ func (s *ProductStorage) CreateProducts(products *[]model.Product) ([]model.Prod
 }
 
 func (s *AddressStorage) CreateAddress(address *model.Address) model.Address {
-	database.DB.Db.Create(address)
+	s.db.Create(address)
 	return *address
 }
