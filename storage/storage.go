@@ -5,6 +5,7 @@ import (
 
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/onsana/order_service/data/model"
 	"github.com/onsana/order_service/database"
 )
@@ -42,6 +43,15 @@ func (s *OrderStorage) GetAllOrders() []model.Order {
 	var orders []model.Order
 	database.DB.Db.Find(orders)
 	return orders
+}
+
+func (s *OrderStorage) GetOrderById(id uuid.UUID) (model.Order, error) {
+	var order model.Order
+	result := database.DB.Db.First(&order, "id = ?", id)
+	if result.Error != nil {
+		return order, result.Error
+	}
+	return order, nil
 }
 
 func (s *ProductStorage) CreateProducts(products *[]model.Product) ([]model.Product, error) {

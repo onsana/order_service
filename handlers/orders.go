@@ -13,6 +13,7 @@ import (
 type OrderService interface {
 	GetAllOrders() []model.Order
 	CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error)
+	GetOrderById(id uuid.UUID) (model.Order, error)
 }
 
 type AddressService interface {
@@ -81,4 +82,18 @@ func (oH *OrderHandler) CreateOrder(c fiber.Ctx) error {
 func (oH *OrderHandler) GetAllOrders(c fiber.Ctx) error {
 	orders := oH.oS.GetAllOrders()
 	return c.Status(200).JSON(orders)
+}
+func (oH *OrderHandler) GetOrderById(c fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid ID format"})
+	}
+
+	order, err := oH.oS.GetOrderById(id)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Order not found"})
+	}
+
+	return c.Status(200).JSON(order)
 }

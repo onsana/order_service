@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/onsana/order_service/data"
 	"github.com/onsana/order_service/data/dto"
@@ -12,6 +13,7 @@ import (
 type orderStorage interface {
 	CreateOrder(order *model.Order) model.Order
 	GetAllOrders() []model.Order
+	GetOrderById(id uuid.UUID) (model.Order, error)
 }
 
 type addressStorage interface {
@@ -103,4 +105,7 @@ func (o *orderService) CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error) {
 }
 func (o *orderService) GetAllOrders() []model.Order {
 	return o.oSt.GetAllOrders()
+}
+func (o *orderService) GetOrderById(id uuid.UUID) (model.Order, error) {
+	return o.oSt.GetOrderById(id)
 }
