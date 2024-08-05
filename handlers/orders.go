@@ -12,7 +12,7 @@ import (
 type OrderService interface {
 	CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error)
 	DeleteOrderById(id uuid.UUID) error
-	GetAllOrders() []model.Order
+	GetAllOrders() model.Order
 	GetOrderById(id uuid.UUID) (*model.Order, error)
 	UpdateOrder(orderDto *dto.OrderDto) (*dto.OrderDto, error)
 }
