@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// TODO remove dto from name
 type OrderDto struct {
 	ID          uuid.UUID `json:"id"`
 	UserDto     UserDto   `json:"user,omitempty"`

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1d5b7d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "user_name": "Alice Johnson",
+    "phone_number": "+1234567890",
+    "roles": ["buyer"],
+    "is_blocked": false
+  },
+  {
+    "id": "2d5b7d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "user_name": "Bob Smith",
+    "phone_number": "+1987654321",
+    "roles": ["buyer"],
+    "is_blocked": true
+  },
+  {
+    "id": "3d5b7d7e-6a5a-4e9f-8c58-28456c88b9e3",
+    "user_name": "Carol White",
+    "phone_number": "+1122334455",
+    "roles": ["admin"],
+    "is_blocked": false
+  }
+]

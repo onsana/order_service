@@ -35,6 +35,17 @@ type ProductGatewayMock struct {
 	IdToProductDto map[uuid.UUID]dto.Product
 }
 
+type UserGateway interface {
+	GetExistingUser(userDto *dto.UserDto) (*dto.UserDto, error)
+}
+
+type UserGatewayImpl struct {
+}
+
+type UserGatewayMock struct {
+	IdToUserDto map[uuid.UUID]dto.UserDto
+}
+
 func (p *ProductGatewayImpl) GetExistingProducts(_ *[]dto.Product) (*[]dto.Product, []uuid.UUID) {
 	// here should be invocation of Product Service instance
 	products := make([]dto.Product, 2)
@@ -56,6 +67,20 @@ func (p *ProductGatewayMock) GetExistingProducts(productsDto *[]dto.Product) (*[
 		}
 	}
 	return productsDto, absentIds
+}
+
+func (p *UserGatewayImpl) GetExistingUser(userDto *dto.UserDto) (*dto.UserDto, error) {
+	// here should be invocation of User Service instance
+	return nil, nil
+}
+
+func (g *UserGatewayMock) GetExistingUser(userDto *dto.UserDto) (*dto.UserDto, error) {
+	user, ok := g.IdToUserDto[userDto.ID]
+	if !ok {
+		return nil, fmt.Errorf("user with id %s does not exists", userDto.ID)
+	} else {
+		return &user, nil
+	}
 }
 
 type OrderHandler struct {

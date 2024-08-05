@@ -14,7 +14,7 @@ func main() {
 	app := fiber.New()
 	app.Use(handlers.AuthMiddleware)
 	setup(app)
-	err := app.Listen(":6000")
+	err := app.Listen(":8000")
 	if err != nil {
 		return
 	}
@@ -28,10 +28,13 @@ func setup(app *fiber.App) {
 	productStorage := storage.NewProductStorage(db)
 
 	idToProductDto := data.CreateProductMock()
+	idToUserDto := data.CreateUsersMock()
 	productGateway := service.NewProductGatewayMock(idToProductDto)
+	userGateway := service.NewUserGatewayMock(idToUserDto)
+	userService := service.NewUserService(userGateway)
 	addressService := service.NewAddressService(addressStorage)
 	productService := service.NewProductService(productStorage, productGateway)
-	orderService := service.NewOrderService(orderStorage, *addressService, *productService)
+	orderService := service.NewOrderService(orderStorage, *addressService, *productService, *userService)
 
 	orderHandler := handlers.NewHandler(orderService)
 
@@ -41,5 +44,4 @@ func setup(app *fiber.App) {
 	app.Put("/orders/:id", orderHandler.UpdateOrder)
 	app.Delete("/orders/:id", orderHandler.DeleteOrderById)
 
-	// app.Put("/orders/:id", handlers.UpdateOrderDataById)
 }

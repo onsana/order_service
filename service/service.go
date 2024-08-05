@@ -30,7 +30,9 @@ type orderService struct {
 	oSt orderStorage
 	aS  addressService
 	pS  productService
+	uS  userService
 }
+
 type addressService struct {
 	aSt addressStorage
 }
@@ -40,11 +42,16 @@ type productService struct {
 	pG  handlers.ProductGateway
 }
 
-func NewOrderService(oSt orderStorage, aS addressService, pS productService) *orderService {
+type userService struct {
+	uG handlers.UserGateway
+}
+
+func NewOrderService(oSt orderStorage, aS addressService, pS productService, uS userService) *orderService {
 	return &orderService{
 		oSt: oSt,
 		aS:  aS,
 		pS:  pS,
+		uS:  uS,
 	}
 }
 func NewAddressService(aSt addressStorage) *addressService {
@@ -55,6 +62,10 @@ func NewProductService(pSt productStorage, pG handlers.ProductGateway) *productS
 	return &productService{pSt: pSt, pG: pG}
 }
 
+func NewUserService(uG handlers.UserGateway) *userService {
+	return &userService{uG: uG}
+}
+
 func NewProductGatewayMock(idToProductDto map[uuid.UUID]dto.Product) *handlers.ProductGatewayMock {
 	return &handlers.ProductGatewayMock{
 		IdToProductDto: idToProductDto,
@@ -63,6 +74,16 @@ func NewProductGatewayMock(idToProductDto map[uuid.UUID]dto.Product) *handlers.P
 
 func NewProductGatewayImpl() *handlers.ProductGatewayImpl {
 	return &handlers.ProductGatewayImpl{}
+}
+
+func NewUserGatewayMock(idToProductDto map[uuid.UUID]dto.UserDto) *handlers.UserGatewayMock {
+	return &handlers.UserGatewayMock{
+		IdToUserDto: idToProductDto,
+	}
+}
+
+func NewUserGatewayImpl() *handlers.UserGatewayImpl {
+	return &handlers.UserGatewayImpl{}
 }
 
 func (a *addressService) CreateAddress(addressDto *dto.Address, order model.Order) (*dto.Address, error) {
@@ -92,6 +113,14 @@ func (p *productService) ValidateProducts(productsDto *[]dto.Product) (*[]dto.Pr
 }
 
 func (o *orderService) CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error) {
+	user, err := o.uS.uG.GetExistingUser(&orderDto.UserDto)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	if user.Blocked {
+		return uuid.Nil, fmt.Errorf("can not create order because uses %s is blocked", user.ID)
+	}
+
 	validatedProducts, err := o.pS.ValidateProducts(&orderDto.Products)
 	if err != nil {
 		return uuid.Nil, err
@@ -127,12 +156,20 @@ func (o *orderService) DeleteOrderById(id uuid.UUID) error {
 }
 
 func (o *orderService) UpdateOrder(orderDto *dto.OrderDto) (*dto.OrderDto, error) {
+	user, err := o.uS.uG.GetExistingUser(&orderDto.UserDto)
+	if err != nil {
+		return nil, err
+	}
+	if user.Blocked {
+		return nil, fmt.Errorf("can not update order because uses %s is blocked", user.ID)
+	}
+
 	orderModel, err := o.oSt.GetOrderById(orderDto.ID)
 	if err != nil {
 		return nil, fmt.Errorf("order with id = %v doesn't exsist", orderDto.ID)
 	}
 
-	err = validateOrderStatus(orderModel)
+	err = validateOrderStatus(orderModel, user)
 	if err != nil {
 		return nil, err
 	}
@@ -144,8 +181,15 @@ func (o *orderService) UpdateOrder(orderDto *dto.OrderDto) (*dto.OrderDto, error
 	return data.ConvertOrderToDto(order), nil
 }
 
-func validateOrderStatus(orderModel *model.Order) error {
-	if orderModel != nil && orderModel.Status != "pending" {
+func validateOrderStatus(orderModel *model.Order, user *dto.UserDto) error {
+	var isAdmin bool
+	roles := user.Roles
+	for _, role := range roles {
+		if "admin" == role {
+			isAdmin = true
+		}
+	}
+	if orderModel != nil && orderModel.Status != "pending" && !isAdmin {
 		return fmt.Errorf("order can be updated just in Pending status")
 	}
 	return nil

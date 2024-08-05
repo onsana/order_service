@@ -2,10 +2,8 @@ package database
 
 import (
 	"fmt"
-	"log"
-	"os"
-
 	"github.com/onsana/order_service/data/model"
+	"log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -14,10 +12,13 @@ import (
 
 func NewDBConnection() *gorm.DB {
 	dsn := fmt.Sprintf(
-		"host=postgresdb user=%s password=%s dbname=%s port=5432 sslmode=disable",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
+		"host=localhost user=%s password=%s dbname=%s port=5432 sslmode=disable",
+		//os.Getenv("DB_USER"),
+		//os.Getenv("DB_PASSWORD"),
+		//os.Getenv("DB_NAME"),
+		"postgres",
+		"postgres",
+		"postgres",
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{

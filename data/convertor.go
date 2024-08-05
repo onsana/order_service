@@ -132,8 +132,23 @@ func convertProductMockDtoToProduct(mockDto dto.ProductMockDto) (dto.Product, er
 	}, nil
 }
 
+func convertUserMockToUser(mockDto dto.UserMockDto) (dto.UserDto, error) {
+	userID, err := uuid.Parse(mockDto.ID)
+	if err != nil {
+		return dto.UserDto{}, fmt.Errorf("invalid UUID format in covertor: %w", err)
+	}
+
+	return dto.UserDto{
+		ID:          userID,
+		Name:        mockDto.Name,
+		PhoneNumber: mockDto.PhoneNumber,
+		Roles:       mockDto.Roles,
+		Blocked:     mockDto.Blocked,
+	}, nil
+}
+
 func CreateProductMock() map[uuid.UUID]dto.Product {
-	file, err := os.Open("/Users/bigmag/Documents/service-order/order_service/data/dto/productMock.json")
+	file, err := os.Open("data/dto/productMock.json")
 	if err != nil {
 		log.Fatalf("Error opening JSON file: %v", err)
 	}
@@ -165,4 +180,39 @@ func CreateProductMock() map[uuid.UUID]dto.Product {
 		productMap[productID] = productDto
 	}
 	return productMap
+}
+
+func CreateUsersMock() map[uuid.UUID]dto.UserDto {
+	file, err := os.Open("data/dto/userMock.json")
+	if err != nil {
+		log.Fatalf("Error opening JSON file: %v", err)
+	}
+	defer func(file *os.File) {
+		if err := file.Close(); err != nil {
+			log.Printf("Error closing file: %v", err)
+		}
+	}(file)
+
+	byteValue, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatalf("Error reading JSON file: %v", err)
+	}
+
+	var users []dto.UserMockDto
+	err = json.Unmarshal(byteValue, &users)
+	if err != nil {
+		log.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	userMap := make(map[uuid.UUID]dto.UserDto)
+	for _, user := range users {
+		userID, err := uuid.Parse(user.ID)
+		if err != nil {
+			log.Printf("Invalid UUID format: %v", err)
+			continue
+		}
+		productDto, _ := convertUserMockToUser(user)
+		userMap[userID] = productDto
+	}
+	return userMap
 }
