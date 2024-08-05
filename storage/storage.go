@@ -70,7 +70,7 @@ func (s *AddressStorage) CreateAddress(address *model.Address) error {
 
 func (s *OrderStorage) GetAllOrders() []model.Order {
 	var orders []model.Order
-	s.db.Find(orders)
+	s.db.Find(&orders)
 	return orders
 }
 
