@@ -128,13 +128,25 @@ func (o *orderService) DeleteOrderById(id uuid.UUID) error {
 
 func (o *orderService) UpdateOrder(orderDto *dto.OrderDto) (*dto.OrderDto, error) {
 	orderModel, err := o.oSt.GetOrderById(orderDto.ID)
-	//if orderModel != nil && orderModel.Status != "pending"
 	if err != nil {
 		return nil, fmt.Errorf("order with id = %v doesn't exsist", orderDto.ID)
 	}
-	err = o.oSt.UpdateOrder(orderModel)
+
+	err = validateOrderStatus(orderModel)
 	if err != nil {
-		return orderDto, err
+		return nil, err
 	}
-	return data.ConvertOrderToDto(orderModel), nil
+	order := data.ConvertOrder(*orderDto)
+	err = o.oSt.UpdateOrder(order)
+	if err != nil {
+		return nil, err
+	}
+	return data.ConvertOrderToDto(order), nil
+}
+
+func validateOrderStatus(orderModel *model.Order) error {
+	if orderModel != nil && orderModel.Status != "pending" {
+		return fmt.Errorf("order can be updated just in Pending status")
+	}
+	return nil
 }

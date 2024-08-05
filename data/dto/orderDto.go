@@ -9,9 +9,9 @@ import (
 // TODO remove dto from name
 type OrderDto struct {
 	ID          uuid.UUID `json:"id"`
-	UserDto     UserDto   `json:"user"`
-	Products    []Product `json:"products"`
-	Address     Address   `json:"address"`
+	UserDto     UserDto   `json:"user,omitempty"`
+	Products    []Product `json:"products,omitempty"`
+	Address     Address   `json:"address,omitempty"`
 	TotalPrice  float32   `json:"totalPrice"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
