@@ -17,7 +17,7 @@ type OrderService interface {
 }
 
 type AddressService interface {
-	CreateAddress(addressDto *dto.Address, order model.Order) *dto.Address
+	CreateAddress(addressDto *dto.Address, order model.Order) (*dto.Address, error)
 }
 type ProductService interface {
 	CreateProducts(productsDto *[]dto.Product, order model.Order) (*[]dto.Product, error)

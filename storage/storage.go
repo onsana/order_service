@@ -36,9 +36,28 @@ func NewAddressStorage(db *gorm.DB) *AddressStorage {
 	return &AddressStorage{db: db}
 }
 
-func (s *OrderStorage) CreateOrder(order *model.Order) model.Order {
-	s.db.Create(order)
-	return *order
+func (s *OrderStorage) CreateOrder(order *model.Order) error {
+	tx := s.db.Create(order)
+	if tx.Error != nil {
+		return fmt.Errorf("Error during saving order: %v ", order)
+	}
+	return nil
+}
+
+func (s *ProductStorage) CreateProducts(products *[]model.Product) error {
+	tx := s.db.Create(products)
+	if tx.Error != nil {
+		return fmt.Errorf("Error during saving products with ids: %v ", products)
+	}
+	return nil
+}
+
+func (s *AddressStorage) CreateAddress(address *model.Address) error {
+	tx := s.db.Create(address)
+	if tx.Error != nil {
+		return fmt.Errorf("Error during saving address: %v ", address)
+	}
+	return nil
 }
 
 func (s *OrderStorage) GetAllOrders() []model.Order {
@@ -54,18 +73,4 @@ func (s *OrderStorage) GetOrderById(id uuid.UUID) (model.Order, error) {
 		return order, result.Error
 	}
 	return order, nil
-}
-
-func (s *ProductStorage) CreateProducts(products *[]model.Product) ([]model.Product, error) {
-	tx := s.db.Create(products)
-	if tx.Error != nil {
-		return nil, fmt.Errorf("Error during saving products with ids: %v ", products)
-	}
-	//TODO remove returned *products
-	return *products, nil
-}
-
-func (s *AddressStorage) CreateAddress(address *model.Address) model.Address {
-	s.db.Create(address)
-	return *address
 }
