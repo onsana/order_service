@@ -14,6 +14,7 @@ type orderStorage interface {
 	CreateOrder(order *model.Order) error
 	GetAllOrders() []model.Order
 	GetOrderById(id uuid.UUID) (model.Order, error)
+	DeleteOrderById(id uuid.UUID) error
 }
 
 type addressStorage interface {
@@ -118,4 +119,8 @@ func (o *orderService) GetAllOrders() []model.Order {
 }
 func (o *orderService) GetOrderById(id uuid.UUID) (model.Order, error) {
 	return o.oSt.GetOrderById(id)
+}
+
+func (o *orderService) DeleteOrderById(id uuid.UUID) error {
+	return o.oSt.DeleteOrderById(id)
 }

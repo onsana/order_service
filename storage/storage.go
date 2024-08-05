@@ -39,7 +39,7 @@ func NewAddressStorage(db *gorm.DB) *AddressStorage {
 func (s *OrderStorage) CreateOrder(order *model.Order) error {
 	tx := s.db.Create(order)
 	if tx.Error != nil {
-		return fmt.Errorf("Error during saving order: %v ", order)
+		return fmt.Errorf("error during saving order: %v ", order)
 	}
 	return nil
 }
@@ -47,7 +47,7 @@ func (s *OrderStorage) CreateOrder(order *model.Order) error {
 func (s *ProductStorage) CreateProducts(products *[]model.Product) error {
 	tx := s.db.Create(products)
 	if tx.Error != nil {
-		return fmt.Errorf("Error during saving products with ids: %v ", products)
+		return fmt.Errorf("error during saving products with ids: %v ", products)
 	}
 	return nil
 }
@@ -55,7 +55,7 @@ func (s *ProductStorage) CreateProducts(products *[]model.Product) error {
 func (s *AddressStorage) CreateAddress(address *model.Address) error {
 	tx := s.db.Create(address)
 	if tx.Error != nil {
-		return fmt.Errorf("Error during saving address: %v ", address)
+		return fmt.Errorf("error during saving address: %v ", address)
 	}
 	return nil
 }
@@ -73,4 +73,14 @@ func (s *OrderStorage) GetOrderById(id uuid.UUID) (model.Order, error) {
 		return order, result.Error
 	}
 	return order, nil
+}
+func (s *OrderStorage) DeleteOrderById(id uuid.UUID) error {
+	tx := s.db.Delete(&model.Order{}, "id = ?", id)
+	if tx.Error != nil {
+		return fmt.Errorf("error deleting order with id %v: %v", id, tx.Error)
+	}
+	if tx.RowsAffected == 0 {
+		return fmt.Errorf("no order found with id %v", id)
+	}
+	return nil
 }
