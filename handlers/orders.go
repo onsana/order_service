@@ -2,26 +2,18 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v3"
+
 	"github.com/google/uuid"
 	"github.com/onsana/order_service/data/dto"
 	"github.com/onsana/order_service/data/model"
+
+	"github.com/gofiber/fiber/v3"
 )
 
-func GetAllOrders(c fiber.Ctx) error {
-	var orders []model.Order
-	// TODO temp changes
-	//result := database.DB.Db.Find(&orders)
-	//if result.Error != nil {
-	//	log.Println(result.Error)
-	//	return c.Status(fiber.StatusInternalServerError).SendString("Помилка під час отримання замовлень")
-	//}
-
-	return c.JSON(orders)
-}
-
 type OrderService interface {
+	GetAllOrders() []model.Order
 	CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error)
+	GetOrderById(id uuid.UUID) (model.Order, error)
 }
 
 type AddressService interface {
@@ -85,4 +77,23 @@ func (oH *OrderHandler) CreateOrder(c fiber.Ctx) error {
 		return c.Status(422).JSON(any(err.Error()))
 	}
 	return c.Status(201).JSON(any(fmt.Sprintf("Order created with id = %s", orderId)))
+}
+
+func (oH *OrderHandler) GetAllOrders(c fiber.Ctx) error {
+	orders := oH.oS.GetAllOrders()
+	return c.Status(200).JSON(orders)
+}
+func (oH *OrderHandler) GetOrderById(c fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid ID format"})
+	}
+
+	order, err := oH.oS.GetOrderById(id)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Order not found"})
+	}
+
+	return c.Status(200).JSON(order)
 }
