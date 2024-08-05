@@ -3,12 +3,13 @@ package data
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/onsana/order_service/data/dto"
-	"github.com/onsana/order_service/data/model"
 	"io"
 	"log"
 	"os"
+
+	"github.com/google/uuid"
+	"github.com/onsana/order_service/data/dto"
+	"github.com/onsana/order_service/data/model"
 )
 
 func convertUser(userDto dto.UserDto) model.User {

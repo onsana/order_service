@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/onsana/order_service/data/dto"
@@ -11,7 +12,7 @@ import (
 type OrderService interface {
 	CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error)
 	DeleteOrderById(id uuid.UUID) error
-	GetAllOrders() []model.Order
+	GetAllOrders() model.Order
 	GetOrderById(id uuid.UUID) (*model.Order, error)
 	UpdateOrder(orderDto *dto.OrderDto) (*dto.OrderDto, error)
 }
@@ -106,8 +107,10 @@ func (oH *OrderHandler) CreateOrder(c fiber.Ctx) error {
 
 func (oH *OrderHandler) GetAllOrders(c fiber.Ctx) error {
 	orders := oH.oS.GetAllOrders()
+	fmt.Println("Orders:", orders)
 	return c.Status(200).JSON(orders)
 }
+
 func (oH *OrderHandler) GetOrderById(c fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
