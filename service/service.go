@@ -12,7 +12,7 @@ import (
 
 type orderStorage interface {
 	CreateOrder(order *model.Order) error
-	GetAllOrders() []model.Order
+	GetAllOrders() model.Order
 	GetOrderById(id uuid.UUID) (*model.Order, error)
 	UpdateOrder(order *model.Order) error
 	DeleteOrderById(id uuid.UUID) error
@@ -115,7 +115,7 @@ func (o *orderService) CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error) {
 
 	return order.ID, nil
 }
-func (o *orderService) GetAllOrders() []model.Order {
+func (o *orderService) GetAllOrders() model.Order {
 	return o.oSt.GetAllOrders()
 }
 func (o *orderService) GetOrderById(id uuid.UUID) (*model.Order, error) {
