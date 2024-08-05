@@ -3,12 +3,13 @@ package data
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/onsana/order_service/data/dto"
-	"github.com/onsana/order_service/data/model"
 	"io"
 	"log"
 	"os"
+
+	"github.com/google/uuid"
+	"github.com/onsana/order_service/data/dto"
+	"github.com/onsana/order_service/data/model"
 )
 
 func convertUser(userDto dto.UserDto) model.User {
@@ -133,7 +134,7 @@ func convertProductMockDtoToProduct(mockDto dto.ProductMockDto) (dto.Product, er
 }
 
 func CreateProductMock() map[uuid.UUID]dto.Product {
-	file, err := os.Open("/Users/bigmag/Documents/service-order/order_service/data/dto/productMock.json")
+	file, err := os.Open("data/dto/productMock.json")
 	if err != nil {
 		log.Fatalf("Error opening JSON file: %v", err)
 	}
