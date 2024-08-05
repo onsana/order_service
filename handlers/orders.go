@@ -14,6 +14,7 @@ type OrderService interface {
 	GetAllOrders() []model.Order
 	CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error)
 	GetOrderById(id uuid.UUID) (model.Order, error)
+	DeleteOrderById(id uuid.UUID) error
 }
 
 type AddressService interface {
@@ -96,4 +97,18 @@ func (oH *OrderHandler) GetOrderById(c fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(order)
+}
+func (oH *OrderHandler) DeleteOrderById(c fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid ID format"})
+	}
+
+	err = oH.oS.DeleteOrderById(id)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "order not found or could not be deleted"})
+	}
+
+	return c.Status(204).JSON(nil)
 }

@@ -2,9 +2,10 @@ package database
 
 import (
 	"fmt"
-	"github.com/onsana/order_service/data/model"
 	"log"
 	"os"
+
+	"github.com/onsana/order_service/data/model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
