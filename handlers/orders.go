@@ -2,19 +2,18 @@ package handlers
 
 import (
 	"fmt"
-
+	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/onsana/order_service/data/dto"
 	"github.com/onsana/order_service/data/model"
-
-	"github.com/gofiber/fiber/v3"
 )
 
 type OrderService interface {
-	GetAllOrders() []model.Order
 	CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error)
-	GetOrderById(id uuid.UUID) (model.Order, error)
 	DeleteOrderById(id uuid.UUID) error
+	GetAllOrders() []model.Order
+	GetOrderById(id uuid.UUID) (*model.Order, error)
+	UpdateOrder(orderDto *dto.OrderDto) (*dto.OrderDto, error)
 }
 
 type AddressService interface {
@@ -111,4 +110,32 @@ func (oH *OrderHandler) DeleteOrderById(c fiber.Ctx) error {
 	}
 
 	return c.Status(204).JSON(nil)
+}
+
+func (oH *OrderHandler) UpdateOrder(c fiber.Ctx) error {
+	orderDto := new(dto.OrderDto)
+	if err := c.Bind().JSON(orderDto); err != nil {
+		return err
+	}
+
+	err := updateOrderDtoWithId(orderDto, c)
+	if err != nil {
+		return c.Status(404).JSON(any(err.Error()))
+	}
+
+	order, err := oH.oS.UpdateOrder(orderDto)
+	if err != nil {
+		return c.Status(404).JSON(any(err.Error()))
+	}
+	return c.Status(200).JSON(order)
+}
+
+func updateOrderDtoWithId(orderDto *dto.OrderDto, c fiber.Ctx) error {
+	id := c.Params("id")
+	parsedId, err := uuid.Parse(id)
+	if err != nil {
+		return fmt.Errorf("Order cannot be update, incorrect uuid format")
+	}
+	orderDto.ID = parsedId
+	return nil
 }

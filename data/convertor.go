@@ -63,6 +63,32 @@ func ConvertOrder(orderDto dto.OrderDto) *model.Order {
 	return order
 }
 
+// ConvertOrderToDto converts a *model.Order to a dto.OrderDto
+func ConvertOrderToDto(order *model.Order) *dto.OrderDto {
+	userDto := convertUserToDto(&order.User)
+	orderDto := dto.OrderDto{
+		ID:          order.ID,
+		UserDto:     userDto,
+		TotalPrice:  order.TotalPrice,
+		CreatedAt:   order.CreatedAt,
+		UpdatedAt:   order.UpdatedAt,
+		Description: order.Description,
+		Status:      dto.Kind(order.Status), // Assuming model.Kind is an integer type
+	}
+	return &orderDto
+}
+
+// convertUserToDto converts a *model.User to a dto.UserDto
+func convertUserToDto(user *model.User) dto.UserDto {
+	return dto.UserDto{
+		ID:          user.ID,
+		Name:        user.Name,
+		PhoneNumber: user.PhoneNumber,
+		//Roles:       user.Roles,
+		Blocked: user.Blocked,
+	}
+}
+
 func ConvertProduct(productsDto []dto.Product, order model.Order) *[]model.Product {
 	var products []model.Product
 	for _, p := range productsDto {

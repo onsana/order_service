@@ -13,7 +13,8 @@ import (
 type orderStorage interface {
 	CreateOrder(order *model.Order) error
 	GetAllOrders() []model.Order
-	GetOrderById(id uuid.UUID) (model.Order, error)
+	GetOrderById(id uuid.UUID) (*model.Order, error)
+	UpdateOrder(order *model.Order) error
 	DeleteOrderById(id uuid.UUID) error
 }
 
@@ -117,10 +118,23 @@ func (o *orderService) CreateOrder(orderDto *dto.OrderDto) (uuid.UUID, error) {
 func (o *orderService) GetAllOrders() []model.Order {
 	return o.oSt.GetAllOrders()
 }
-func (o *orderService) GetOrderById(id uuid.UUID) (model.Order, error) {
+func (o *orderService) GetOrderById(id uuid.UUID) (*model.Order, error) {
 	return o.oSt.GetOrderById(id)
 }
 
 func (o *orderService) DeleteOrderById(id uuid.UUID) error {
 	return o.oSt.DeleteOrderById(id)
+}
+
+func (o *orderService) UpdateOrder(orderDto *dto.OrderDto) (*dto.OrderDto, error) {
+	orderModel, err := o.oSt.GetOrderById(orderDto.ID)
+	//if orderModel != nil && orderModel.Status != "pending"
+	if err != nil {
+		return nil, fmt.Errorf("order with id = %v doesn't exsist", orderDto.ID)
+	}
+	err = o.oSt.UpdateOrder(orderModel)
+	if err != nil {
+		return orderDto, err
+	}
+	return data.ConvertOrderToDto(orderModel), nil
 }

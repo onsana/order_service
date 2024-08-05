@@ -44,6 +44,14 @@ func (s *OrderStorage) CreateOrder(order *model.Order) error {
 	return nil
 }
 
+func (s *OrderStorage) UpdateOrder(order *model.Order) error {
+	tx := s.db.Updates(order)
+	if tx.Error != nil {
+		return fmt.Errorf("Error during updating order: %v ", order)
+	}
+	return nil
+}
+
 func (s *ProductStorage) CreateProducts(products *[]model.Product) error {
 	tx := s.db.Create(products)
 	if tx.Error != nil {
@@ -66,14 +74,22 @@ func (s *OrderStorage) GetAllOrders() []model.Order {
 	return orders
 }
 
-func (s *OrderStorage) GetOrderById(id uuid.UUID) (model.Order, error) {
+func (s *OrderStorage) GetOrderById(id uuid.UUID) (*model.Order, error) {
 	var order model.Order
 	result := s.db.First(&order, "id = ?", id)
 	if result.Error != nil {
-		return order, result.Error
+		return &order, result.Error
 	}
-	return order, nil
+	return &order, nil
 }
+
+//	func (s *OrderStorage) GetOrder(orderId uuid.UUID) (*model.Order, error) {
+//		var order model.Order
+//		if err := s.db.First(&order, "id = ?", orderId).Error; err != nil {
+//			return nil, err
+//		}
+//		return &order, nil
+//	}
 func (s *OrderStorage) DeleteOrderById(id uuid.UUID) error {
 	tx := s.db.Delete(&model.Order{}, "id = ?", id)
 	if tx.Error != nil {
